@@ -7,6 +7,8 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 
+steps = 3000
+
 
 def showProgress():
     global threadsStarted
@@ -15,6 +17,13 @@ def showProgress():
         time.sleep(1)
 
 
+def doJob(i):
+    global threadsStarted
+    for i in range(i, i + steps, 4):
+        curr = threading.Thread(target=evalPxl, args=[i])
+        curr.start()
+        threadsStarted += 1
+
 def evalPxl(i):
     j = 0
     toBinString = string[i:i + 4]
@@ -22,9 +31,11 @@ def evalPxl(i):
     while i >= h:
         j += 1
         i = i - w
-    value = int(toBinString, 2)
-    data[j, int(i)] = [coloursFrame.iloc[value]["R"], coloursFrame.iloc[value]["G"], coloursFrame.iloc[value]["B"]]
-
+    try:
+        value = int(toBinString, 2)
+        data[j, int(i)] = [coloursFrame.iloc[value]["R"], coloursFrame.iloc[value]["G"], coloursFrame.iloc[value]["B"]]
+    except ValueError:
+        int(1)
 
 print("NOTE: you need to have a few python packages installed for this to worked, PIL (or pillow) numpy and pandas")
 print("Please put in the path to your file (relative or full both work)")
@@ -60,10 +71,9 @@ leng = int(len(string) / 4)
 progress = threading.Thread(target=showProgress)
 progress.start()
 
-for i in range(0,len(string),4):
-    curr = threading.Thread(target=evalPxl, args=[i])
+for i in range(0, len(string), steps):
+    curr = threading.Thread(target=doJob, args=[i])
     curr.start()
-    threadsStarted += 1
 
 while threading.active_count() != 1:
     print(str(int(threading.active_count())) + " threads alive")

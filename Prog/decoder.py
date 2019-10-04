@@ -10,7 +10,7 @@ def selectVal(colour):
 
 coloursFrame = pd.read_csv("pxls.space palette.csv")
 
-decoded = open("decoded.jpg", 'wb')
+decoded = open("decoded", 'wb')
 image = Image.open("image.png",'r')
 
 string = ''
@@ -21,7 +21,7 @@ for x in image.getdata():
         binval = bin(val)
         vals.append(binval)
     except TypeError:
-        print("end of file")
+        print("")
 
 # TODO fix picutre format errors (decoded picture not being able to be shown)
 for x in range(0, len(vals), 2):
